@@ -6,12 +6,12 @@ public class UserInfo {
     private String firstName;
     private String lastName;
     private String email;
-    private long phonenum;
+    private String phonenum;
 
     public UserInfo() {
     }
 
-    public UserInfo(long userId, String firstName, String lastName, String email, long phonenum) {
+    public UserInfo(long userId, String firstName, String lastName, String email, String phonenum) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -51,11 +51,11 @@ public class UserInfo {
         this.email = email;
     }
 
-    public long getPhonenum() {
+    public String getPhonenum() {
         return phonenum;
     }
 
-    public void setPhonenum(long phonenum) {
+    public void setPhonenum(String phonenum) {
         this.phonenum = phonenum;
     }
 

@@ -7,13 +7,13 @@ public class UserDto {
     private String email;
     private String password;
     private String reenterpassword;
-    private long phonenum;
+    private String phonenum;
 
     public UserDto() {
     }
 
     public UserDto(String firstName, String lastName, String email, String password, String reenterpassword,
-            long phonenum) {
+    String phonenum) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -62,11 +62,11 @@ public class UserDto {
         this.reenterpassword = reenterpassword;
     }
 
-    public long getPhonenum() {
+    public String getPhonenum() {
         return phonenum;
     }
 
-    public void setPhonenum(long phonenum) {
+    public void setPhonenum(String phonenum) {
         this.phonenum = phonenum;
     }
 

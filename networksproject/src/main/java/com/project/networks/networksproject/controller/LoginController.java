@@ -1,5 +1,6 @@
 package com.project.networks.networksproject.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.networks.networksproject.dto.UserDto;
 import com.project.networks.networksproject.dto.UserInfo;
+import com.project.networks.networksproject.exception.CommonUserException;
+import com.project.networks.networksproject.exception.UserLoginRequiredException;
 import com.project.networks.networksproject.service.IUserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,44 +30,70 @@ public class LoginController {
     private IUserService userService;
 
     @PostMapping("/createUser")
-    public void createUser(@RequestBody UserDto user){
+    public void createUser(@RequestBody UserDto user) throws IOException{
         userService.createUser(user);
     }
 
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @GetMapping("/allUsers")
-    public List<UserInfo> getallUser(){
+    public List<UserInfo> getallUser(HttpServletRequest request) throws IOException{
+        HttpSession session = request.getSession();
+        if(session.getAttribute("userId") == null){
+            throw new UserLoginRequiredException("Please Login to use service");
+        }
+        if(session.getAttribute("type") == null){
+            throw new CommonUserException("Not a root user");
+        }
         return userService.getAllUsers();
     }
 
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @GetMapping("/getUserById/{id}")
-    public UserInfo getUserById(@PathVariable long id){
+    public UserInfo getUserById(@PathVariable long id, HttpServletRequest request) throws IOException{
+        HttpSession session = request.getSession();
+        if(session.getAttribute("userId") == null){
+            throw new UserLoginRequiredException("Please Login to use service");
+        }
+        if(session.getAttribute("type") == null){
+            throw new CommonUserException("Not a root user");
+        }
         UserInfo userInfo = userService.getUserById(id);
         return userInfo;
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)
     @DeleteMapping("/deleteUserById/{id}")
-    public UserInfo deleteUserById(@PathVariable long id, HttpServletRequest request){
+    public UserInfo deleteUserById(@PathVariable long id, HttpServletRequest request) throws IOException{
         HttpSession session = request.getSession();
+        if(session.getAttribute("userId") == null){
+            throw new UserLoginRequiredException("Please Login to use service");
+        }
+        if(session.getAttribute("type") == null){
+            throw new CommonUserException("Not a root user");
+        }
         UserInfo user = userService.deleteUserById(id);
         return user;
     }    
 
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PostMapping("/login/{email}/{password}")
-    public String login(@PathVariable String email, @PathVariable String password, HttpServletRequest request){
-        UserInfo user = userService.login(email, password);
+    public String login(@PathVariable String email, @PathVariable String password, HttpServletRequest request) throws IOException{
         HttpSession session = request.getSession();
-        session.setAttribute("userId", user.getUserId());
-        if (user.getUserId() == 1) {
-            session.setAttribute("type", "rootUser");
+        UserInfo user = userService.login(email, password);
+        if(session.getAttribute("userId") == null){
+            session.setAttribute("userId", user.getUserId());
+            if (user.getUserId() == 102) {
+                session.setAttribute("type", "rootUser");
+            }
+        }else{
+            return "Logout required";
         }
         return "Login successful......Welcome " + user;
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @PostMapping("/logout/{sample}")
-    public String logout(HttpServletRequest request){
+    @PostMapping("/logout")
+    public String logout(HttpServletRequest request) throws IOException{
         HttpSession session = request.getSession();
         if(session.getAttribute("userId") != null){
             Object obj = session.getAttribute("userId");

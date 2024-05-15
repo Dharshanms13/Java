@@ -3,6 +3,7 @@ package com.project.networks.networksproject.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class User {
@@ -15,6 +16,9 @@ public class User {
     private String email;
     private String password;
     private String phonenum;
+
+    // @OneToOne
+    // private UserDetailsCommon userDetailsCommon;
 
     public User() {
     }
